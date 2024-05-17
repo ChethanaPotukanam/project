@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', function () {
             body: JSON.stringify({ username, email, password })
         }).then(response => response.json()).then(data => {
             alert(data.message);
+        }).catch(error => {
+            console.error('Error registering user:', error);
         });
     });
 
@@ -35,6 +37,8 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 alert(data.message);
             }
+        }).catch(error => {
+            console.error('Error logging in:', error);
         });
     });
 
@@ -51,7 +55,9 @@ document.addEventListener('DOMContentLoaded', function () {
             body: JSON.stringify({ user_id: userId, item_name: itemName, description: itemDescription, category: itemCategory })
         }).then(response => response.json()).then(data => {
             alert(data.message);
-            loadItems();
+            loadItems(); // Reload items after adding a new one
+        }).catch(error => {
+            console.error('Error adding item:', error);
         });
     });
 
@@ -59,14 +65,16 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('api.php?action=get_items')
             .then(response => response.json())
             .then(data => {
-                itemsList.innerHTML = '';
+                itemsList.innerHTML = ''; // Clear previous items
                 data.items.forEach(item => {
                     const li = document.createElement('li');
                     li.textContent = `${item.item_name} (${item.category}): ${item.description}`;
                     itemsList.appendChild(li);
                 });
+            }).catch(error => {
+                console.error('Error loading items:', error);
             });
     }
 
-    loadItems();
+    loadItems(); // Load items when the page loads
 });
