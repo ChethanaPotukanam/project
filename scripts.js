@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         fetch('api.php?action=register', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `username=${username}&email=${email}&password=${password}`
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
         }).then(response => response.json()).then(data => {
             alert(data.message);
         });
@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         fetch('api.php?action=login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `username=${username}&password=${password}`
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
         }).then(response => response.json()).then(data => {
             if (data.status === 'success') {
                 localStorage.setItem('user_id', data.user_id);
@@ -47,8 +47,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         fetch('api.php?action=add_item', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `user_id=${userId}&item_name=${itemName}&description=${itemDescription}&category=${itemCategory}`
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, item_name: itemName, description: itemDescription, category: itemCategory })
         }).then(response => response.json()).then(data => {
             alert(data.message);
             loadItems();

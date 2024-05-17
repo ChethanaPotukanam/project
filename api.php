@@ -15,9 +15,10 @@ header("Content-Type: application/json");
 $action = $_GET['action'];
 
 if ($action == 'register') {
-    $username = $_POST['username'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $email = $_POST['email'];
+    $data = json_decode(file_get_contents('php://input'), true);
+    $username = $data['username'];
+    $password = password_hash($data['password'], PASSWORD_DEFAULT);
+    $email = $data['email'];
 
     $sql = "INSERT INTO Users (username, password, email) VALUES ('$username', '$password', '$email')";
     if ($conn->query($sql) === TRUE) {
@@ -26,8 +27,9 @@ if ($action == 'register') {
         echo json_encode(["status" => "error", "message" => $conn->error]);
     }
 } elseif ($action == 'login') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $data = json_decode(file_get_contents('php://input'), true);
+    $username = $data['username'];
+    $password = $data['password'];
 
     $sql = "SELECT * FROM Users WHERE username='$username'";
     $result = $conn->query($sql);
@@ -39,10 +41,11 @@ if ($action == 'register') {
         echo json_encode(["status" => "error", "message" => "Invalid credentials."]);
     }
 } elseif ($action == 'add_item') {
-    $user_id = $_POST['user_id'];
-    $item_name = $_POST['item_name'];
-    $description = $_POST['description'];
-    $category = $_POST['category'];
+    $data = json_decode(file_get_contents('php://input'), true);
+    $user_id = $data['user_id'];
+    $item_name = $data['item_name'];
+    $description = $data['description'];
+    $category = $data['category'];
 
     $sql = "INSERT INTO Items (user_id, item_name, description, category) VALUES ('$user_id', '$item_name', '$description', '$category')";
     if ($conn->query($sql) === TRUE) {
