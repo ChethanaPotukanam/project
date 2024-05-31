@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Donations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .item {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            width: 30%;
+        }
+
+        .item h2 {
+            margin-top: 0;
+        }
+
+        .item button {
+            padding: 5px 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .item button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <% donations.forEach(donation=> { %>
+            <div class="item">
+                <h2>
+                    <%= donation.item %>
+                </h2>
+                <p>
+                    <%= donation.description %>
+                </p>
+                <p>Quantity: <%= donation.quantity %>
+                </p>
+                <form action="/delete/<%= donation._id %>" method="post">
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+            <% }) %>
+    </div>
+</body>
+
+</html>
