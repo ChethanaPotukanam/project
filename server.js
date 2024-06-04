@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
+const session = require('express-session');
 
 const app = express();
 const port = 3000;
@@ -12,14 +13,96 @@ app.set('views', path.join(__dirname, 'public', 'views'));
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
 
-
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(session({
+    secret: 'your_secret_key',
+    resave: false,
+    saveUninitialized: true,
+}));
+
+// Serve static files
+app.use(express.static('public'));
 
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/donationDB');
 
+// User model
+const User = mongoose.model('User', { email: String, password: String, username: String });
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/signup', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'signup.html'));
+});
+
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        console.log('Attempting to find user in the database:', email);
+        const user = await User.findOne({ email: email, password: password });
+
+        if (!user) {
+            console.log('User not found or invalid credentials:', email);
+            return res.json({ success: false, message: 'Invalid email or password. Signup if you do not have an account.' });
+        }
+
+        console.log('User found in the database:', user.email);
+
+        req.session.user = { id: user._id, username: user.username };
+        console.log('Session user assigned:', req.session.user);
+
+        if (email === 'admin@admin.com' && password === 'admin1234') {
+            console.log('Admin login detected');
+            return res.json({ success: true, isAdmin: true, username: 'Admin' });
+        } else {
+            console.log('Regular user login detected');
+            return res.json({ success: true, isAdmin: false, username: user.username });
+        }
+    } catch (err) {
+        console.error('Error during login:', err);
+        res.status(500).json({ success: false, message: 'Error during login' });
+    }
+});
+
+
+app.post('/signup', async (req, res) => {
+    const { username, email, password, confirmPassword } = req.body;
+    if (password !== confirmPassword) {
+        return res.json({ success: false, message: 'Passwords do not match' });
+    }
+    const user = new User({ email, password, username });
+    try {
+        await user.save();
+        req.session.user = { id: user._id, username: user.username };
+        return res.json({ success: true, message: 'Signup successful' });
+    } catch (err) {
+        console.error('Error during signup:', err);
+        return res.json({ success: false, message: 'Error during signup' });
+    }
+});
+
+app.get('/fetchUsername', (req, res) => {
+    if (req.session.user) {
+        res.json({ success: true, username: req.session.user.username });
+    } else {
+        res.json({ success: false, username: null });
+    }
+});
+
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Error during logout' });
+        }
+        res.json({ success: true, message: 'Logged out successfully' });
+    });
+});
+
+// Donation schema and model
 const donationSchema = new mongoose.Schema({
     item: String,
     description: String,
@@ -28,64 +111,57 @@ const donationSchema = new mongoose.Schema({
 
 const Donation = mongoose.model('Donation', donationSchema);
 
-// Serve static files
-app.use(express.static('public'));
-
 // Routes
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/index', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/donate', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/donate.html'));
+    res.sendFile(path.join(__dirname, 'public', 'donate.html'));
 });
 
-app.post('/donate', (req, res) => {
+app.post('/donate', async (req, res) => {
     const newDonation = new Donation({
         item: req.body.item,
         description: req.body.description,
         quantity: req.body.quantity
     });
 
-    newDonation.save()
-        .then(() => {
-            res.redirect('/view');
-        })
-        .catch(err => {
-            console.error('Error saving donation:', err);
-            res.status(500).send('Error saving donation');
-        });
+    try {
+        await newDonation.save();
+        res.redirect('/view');
+    } catch (err) {
+        console.error('Error saving donation:', err);
+        res.status(500).send('Error saving donation');
+    }
 });
 
-
-app.get('/view', (req, res) => {
-    Donation.find({})
-        .then(donations => {
-            res.render('view', { donations: donations });
-        })
-        .catch(err => {
-            console.error('Error retrieving donations:', err);
-            res.status(500).send('Error retrieving donations: ' + err.message); // Send detailed error message to the client
-        });
+app.get('/view', async (req, res) => {
+    try {
+        const donations = await Donation.find({});
+        res.render('view', { donations: donations });
+    } catch (err) {
+        console.error('Error retrieving donations:', err);
+        res.status(500).send('Error retrieving donations: ' + err.message);
+    }
 });
 
-
-
-app.post('/delete/:id', (req, res) => {
-    Donation.findByIdAndDelete(req.params.id)
-        .then(result => {
-            // Check if the result is null, meaning no document was found with that ID
-            if (!result) {
-                return res.status(404).send('Donation not found');
-            }
-            res.redirect('/view');
-        })
-        .catch(error => {
-            console.error(error);
-            res.status(500).send('Error deleting donation');
-        });
+app.post('/delete/:id', async (req, res) => {
+    try {
+        const result = await Donation.findByIdAndDelete(req.params.id);
+        if (!result) {
+            return res.status(404).send('Donation not found');
+        }
+        res.redirect('/view');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error deleting donation');
+    }
 });
-
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
