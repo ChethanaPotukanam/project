@@ -1,5 +1,11 @@
+body {
+      background: url('webback.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+}
 #header{
-    background-color:rgb(140, 237, 237);
+    background-color:rgb(245, 247, 247);
 }
 .footertext{
     color:rgb(247, 166, 73);

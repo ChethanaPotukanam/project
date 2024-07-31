@@ -5,13 +5,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="Sharehub.png" sizes="124x124" type="image/x-icon">
     <title>Donate Items</title>
     <style>
-        body {
+        /* body {
             font-family: Arial, sans-serif;
             background: linear-gradient(to right, #0000FF, #00BFFF, #87CEFA);
+        } */
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
         }
-        
+
+        body {
+            background: url('bluesparkle.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            /* background-color: white; */
+        }
+
+        header,
+        footer {
+            background: rgba(255, 255, 255, 0.8);
+            /* Semi-transparent background */
+            padding: 10px;
+            text-align: center;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .form-container {
+            background: url('bluesparkle.png') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            /* Larger width for the form container */
+            width: 100%;
+            margin: 20px;
+        }
+
+        .form-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .form-group button.bg-green-500 {
+            background-color: #48bb78;
+        }
+
+        .form-group button.bg-green-500:hover {
+            background-color: #38a169;
+        }
+
+        .form-group button.bg-blue-500 {
+            background-color: #4299e1;
+        }
+
+        .form-group button.bg-blue-500:hover {
+            background-color: #3182ce;
+        }
     </style>
 </head>
 
@@ -19,27 +111,37 @@
     <header class="text-gray-600 body-font">
         <div class="w-full flex flex-wrap p-5 flex-col md:flex-row items-center" id="header">
             <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-                <img src="logo.jpg" alt="Company Logo" style="width: 100px; height: 100px;">
-                <span class="ml-3 text-xl" style="font-size: 38px;color:rgb(247, 166, 73);">Donate</span>
+                <img src="Sharehub.png" alt="Company Logo" style="width: 100px; height: 100px;">
+                <span class="ml-3 text-xl" style="font-size: 38px;color:rgb(74, 181, 195);">ShareHub</span>
             </a>
             <nav class="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
-                <a class="mr-5 hover:text-gray-900" style="font-size: 25px;color:rgb(247, 166, 73);" href="/">Home</a>
-                <a class="mr-5 hover:text-gray-900" style="font-size: 25px;color:rgb(247, 166, 73);"
-                    href="#about">About</a>
-                <a class="mr-5 hover:text-gray-900" style="font-size: 25px;color:rgb(247, 166, 73);">Third Link</a>
-                <a class="mr-5 hover:text-gray-900" style="font-size: 25px;color:rgb(247, 166, 73);">ContactUs</a>
+                <a class="mr-5 hover:text-gray-900" style="font-size: 25px;color:rgb(74, 181, 195);" href="/">Home</a>
+                <a class="mr-5 hover:text-gray-900" style="font-size: 25px;color:rgb(74, 181, 195);"
+                    href="index.html">About</a>
+                <a class="mr-5 hover:text-gray-900" style="font-size: 25px;color:rgb(74, 181, 195);"
+                    href="http://localhost/BooksWorld_project/home.php">Explore</a>
+                <a class="mr-5 hover:text-gray-900" style="font-size: 25px;color:rgb(74, 181, 195);"
+                    href="#contact">ContactUs</a>
             </nav>
-            <button
+            <button id="loginButton"
                 class="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0"
-                style="background-color: rgb(247, 166, 73);"><a href="login.html">Login</a>
+                style="background-color: rgb(74, 181, 195);"><a href="login.html">Login</a>
                 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     class="w-4 h-4 ml-1" viewBox="0 0 24 24">
                     <path d="M5 12h14M12 5l7 7-7 7"></path>
                 </svg>
             </button>
+            <span id="username"
+                class="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0"
+                style="display: none;background-color: rgb(74, 181, 195);border: 2px solid black;"></span>
+            <br>
+            <button id="logoutButton"
+                class="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0"
+                style="display: none;background-color: rgb(74, 181, 195);border: 2px solid black;"
+                onclick="handleLogout()">Logout</button>
         </div>
     </header>
-    <div class="container mx-auto my-8 p-8 bg-white rounded-lg shadow-md" style="background: linear-gradient(to right, #0000FF, #00BFFF, #87CEFA);">
+    <!-- <div class="container mx-auto my-8 p-8 bg-white rounded-lg shadow-md" style="background: linear-gradient(to right, #0000FF, #00BFFF, #87CEFA);">
         <h1 class="text-2xl font-bold mb-6 text-center">Donate an Item</h1>
         <form action="/donate" method="post">
             <div class="form-group mb-4">
@@ -67,8 +169,40 @@
                     Donations</button>
             </div>
         </form>
-    </div>
-    <footer class="flex flex-col space-y-10 justify-center m-0 p-0" style="background: linear-gradient(to right, #0000FF, #00BFFF, #87CEFA);">
+    </div> -->
+    <main>
+        <div class="form-container">
+            <h1 class="text-2xl font-bold mb-6 text-center">Donate an Item</h1>
+            <form action="/donate" method="post">
+                <div class="form-group mb-4">
+                    <label for="item" class="block text-gray-700 mb-2">Item:</label>
+                    <input type="text" id="item" name="item" class="w-full p-3 border border-gray-300 rounded-lg"
+                        required>
+                </div>
+                <div class="form-group mb-4">
+                    <label for="description" class="block text-gray-700 mb-2">Description:</label>
+                    <textarea id="description" name="description" class="w-full p-3 border border-gray-300 rounded-lg"
+                        required></textarea>
+                </div>
+                <div class="form-group mb-4">
+                    <label for="quantity" class="block text-gray-700 mb-2">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity"
+                        class="w-full p-3 border border-gray-300 rounded-lg" required>
+                </div>
+                <div class="form-group mb-4">
+                    <button type="submit"
+                        class="w-full p-3 bg-green-500 text-white rounded-lg hover:bg-green-600">Donate</button>
+                </div>
+            </form>
+            <form action="/view" method="get">
+                <div class="form-group">
+                    <button type="submit" class="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">View
+                        Donations</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <footer id="contact" class="flex flex-col space-y-10 justify-center m-0 p-0" style="background-image: url('bluesparkle.png');">
         <nav class="flex justify-center flex-wrap gap-6 text-gray-500 font-medium">
             Follow us on
         </nav>
