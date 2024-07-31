@@ -71,11 +71,22 @@
                         <h1 class="text-center text-2xl font-semibold text-gray-600">Login</h1>
                         <hr>
                         <div class="flex items-center border-2 py-2 px-3 rounded-md mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                            </svg>
+                        
+                            <input class="pl-2 outline-none border-none w-full" style="background-image: url('bluebubble.jpg'); color: black;"
+                                type="text" name="username" value="" placeholder="Username" required />
+                        </div>
+                        <div class="flex items-center border-2 py-2 px-3 rounded-md mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                             </svg>
+                            
                             <input class="pl-2 outline-none border-none w-full"
                                 style="background-image: url('bluebubble.jpg'); color: black;" type="email" name="email"
                                 value="" placeholder="Email" required />
@@ -147,23 +158,43 @@
     </footer>
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const data = Object.fromEntries(formData.entries());
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const data = Object.fromEntries(formData.entries());
 
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                try {
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    console.log('Response status:', response.status);
+
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    const result = await response.json();
+                    console.log('Login result:', result); // Log the result to debug
+
+                    if (result.success) {
+                        window.location.href = '/';
+                    } else {
+                        // Only alert if result.message is defined
+                        if (result.message) {
+                            alert(result.message);
+                        } else {
+                            console.error('Result message is undefined');
+                            alert('An error occurred during login. Please try again.');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred during login. Please try again.');
+                }
             });
 
-            const result = await response.json();
-            if (result.success) {
-                window.location.href = '/';
-            } else {
-                alert(result.message);
-            }
-        });
     </script>
 </body>
 

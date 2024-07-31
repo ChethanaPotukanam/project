@@ -4,14 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdminView Donations</title>
+    <title>View Donations</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-image: url('don_back.jpg'); /* Correct way to set a background image */
-            background-size: cover; /* Ensure the background covers the entire page */
-            background-position: center; /* Center the background image */
-            background-repeat: no-repeat; /* Prevent the image from repeating */
+            background-image: url('don_back.jpg');
+            /* Correct way to set a background image */
+            background-size: cover;
+            /* Ensure the background covers the entire page */
+            background-position: center;
+            /* Center the background image */
+            background-repeat: no-repeat;
+            /* Prevent the image from repeating */
         }
 
         .container {
@@ -47,7 +51,7 @@
 
         .item button {
             padding: 5px 10px;
-            background-color: #dc3545;
+            background-color:#2396c8;
             color: white;
             border: none;
             border-radius: 5px;
@@ -55,7 +59,7 @@
         }
 
         .item button:hover {
-            background-color: #c82333;
+            background-color:#0a555f;
         }
 
         /* Media query for smaller screens */
@@ -70,6 +74,12 @@
 
 <body>
     <div class="container">
+        <% if (messages.success) { %>
+            <div class="alert alert-success">
+                <%= messages.success %>
+            </div>
+        <% } %>
+
         <% donations.forEach(donation=> { %>
             <div class="item">
                 <h2>
@@ -80,8 +90,8 @@
                 </p>
                 <p>Quantity: <%= donation.quantity %>
                 </p>
-                <form action="/delete/<%= donation._id %>" method="post">
-                    <button type="submit">Delete</button>
+                <form action="/get_item/<%= donation._id %>" method="post">
+                    <button type="submit">Get Item</button>
                 </form>
             </div>
             <% }) %>

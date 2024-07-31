@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
+const flash = require('connect-flash');
 
 const app = express();
 const port = 3000;
@@ -24,7 +25,12 @@ app.use(session({
 
 // Serve static files
 app.use(express.static('public'));
-
+app.use(flash());
+// Make flash messages available to views
+app.use((req, res, next) => {
+    res.locals.messages = req.flash();
+    next();
+});
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/donationDB');
 
@@ -133,7 +139,11 @@ app.post('/donate', async (req, res) => {
 
     try {
         await newDonation.save();
-        res.redirect('/view');
+        if (req.session.user && req.session.user.username === 'Admin') {
+            res.redirect('/view');
+        } else {
+            res.redirect('/norm_user');
+        }
     } catch (err) {
         console.error('Error saving donation:', err);
         res.status(500).send('Error saving donation');
@@ -141,13 +151,33 @@ app.post('/donate', async (req, res) => {
 });
 
 app.get('/view', async (req, res) => {
+    console.log('GET /view route hit');
     try {
         const donations = await Donation.find({});
-        res.render('view', { donations: donations });
+        console.log('Donations retrieved:', donations);
+        if (req.session.user && req.session.user.username === 'Admin') {
+            res.render('view', { donations: donations });
+        } else {
+            res.render('norm_user', { donations: donations });
+        }
     } catch (err) {
         console.error('Error retrieving donations:', err);
         res.status(500).send('Error retrieving donations: ' + err.message);
     }
+});
+
+app.get('/norm_user', async(req, res) => {
+    try {
+        const donations = await Donation.find(); // Fetch all donations from the database
+        res.render('norm_user', { donations, messages: {} }); // Pass donations and empty messages to the view
+    } catch (error) {
+        console.error('Error fetching donations:', error);
+        res.status(500).send('Error fetching donations');
+    }
+});
+
+app.get('/item', (req, res) => {
+    res.render('item'); 
 });
 
 app.post('/delete/:id', async (req, res) => {
@@ -162,7 +192,22 @@ app.post('/delete/:id', async (req, res) => {
         res.status(500).send('Error deleting donation');
     }
 });
+app.post('/get_item/:id', async (req, res) => {
+    try {
+        const result = await Donation.findByIdAndDelete(req.params.id);
+        if (!result) {
+            return res.status(404).send('Donation not found');
+        }
+        res.redirect('/item');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error deleting donation');
+    }
+});
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
+
+
+// FOR ADMIN USE username:Admin mail:admin@admin.com password:admin1234
